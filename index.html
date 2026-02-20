@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小老板养成记 - 奶茶店</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .header-left h1 {
+            color: #333;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left h1::before {
+            content: "🧋";
+            font-size: 28px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-value.money {
+            color: #10b981;
+        }
+
+        .stat-value.day {
+            color: #f59e0b;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title::before {
+            content: "";
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: #667eea;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .product-stock {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .product-stock.low {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .product-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .input-group input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .product-info {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .product-info span {
+            color: #64748b;
+        }
+
+        .product-info .value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .product-info .profit {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .product-recipe {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .recipe-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .recipe-item {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .inventory-section {
+            margin-top: 20px;
+        }
+
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .inventory-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .inventory-header-price {
+            font-size: 12px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .fixed-cost-panel {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .fixed-cost-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fixed-cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #d97706;
+            font-size: 13px;
+        }
+
+        .fixed-cost-item:last-child {
+            border-bottom: none;
+        }
+
+        .fixed-cost-item .label {
+            color: #78350f;
+        }
+
+        .fixed-cost-item .value {
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .fixed-cost-total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid #f59e0b;
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .fixed-cost-total .value {
+            color: #b45309;
+        }
+
+        .cart-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .cart-preview {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .cart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 12px;
+        }
+
+        .cart-items {
+            font-size: 13px;
+            color: #15803d;
+            margin-bottom: 12px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .cart-products {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #22c55e;
+            color: #166534;
+            font-weight: 500;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 600;
+            color: #166534;
+            padding-top: 12px;
+            border-top: 2px solid #22c55e;
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .rank-num {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .rank-name {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .rank-sales {
+            color: #64748b;
+            font-size: 13px;
+            margin-right: 16px;
+        }
+
+        .rank-revenue {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .ing-stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .inventory-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .inventory-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .inventory-actions input {
+            width: 60px;
+            padding: 6px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .mini-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .mini-btn:hover {
+            background: #5a6fd6;
+        }
+
+        .mini-btn.danger {
+            background: #ef4444;
+        }
+
+        .mini-btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .daily-report {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .daily-report.active {
+            display: flex;
+        }
+
+        .report-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .report-header h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .report-date {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .report-items {
+            margin-bottom: 24px;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-item .label {
+            color: #64748b;
+        }
+
+        .report-item .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .report-item .value.positive {
+            color: #10b981;
+        }
+
+        .report-item .value.negative {
+            color: #ef4444;
+        }
+
+        .report-total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .report-total .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .report-total .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .report-event {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .report-title {
+            margin: 16px 0 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .report-detail {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .detail-row .label {
+            color: #64748b;
+        }
+
+        .detail-row .value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .stats-toggle {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .toggle-btn {
+            padding: 6px 16px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: #f1f5f9;
+        }
+
+        .stats-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .nav-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+
+        #statsDayNum {
+            font-weight: 600;
+            color: #333;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .analysis-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .analysis-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+
+        .analysis-row .label {
+            color: #64748b;
+        }
+
+        .analysis-insight {
+            background: #f0f9ff;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 12px;
+            color: #0369a1;
+            margin-top: 8px;
+        }
+
+        .product-analysis {
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        .product-analysis .product-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .welcome-panel {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .welcome-panel h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .welcome-panel p {
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .difficulty-select {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .difficulty-btn {
+            padding: 16px 32px;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #667eea;
+        }
+
+        .difficulty-btn.selected {
+            border-color: #667eea;
+            background: #f0f5ff;
+        }
+
+        .difficulty-btn h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .difficulty-btn p {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .start-btn {
+            padding: 16px 48px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .save-slots {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .save-slot {
+            width: 200px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .save-slot:hover {
+            border-color: #667eea;
+        }
+
+        .save-slot.empty {
+            border-style: dashed;
+            color: #94a3b8;
+        }
+
+        .save-slot .slot-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .save-slot .slot-info {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .employee-section {
+            margin-top: 20px;
+        }
+
+        .employee-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .employee-wage {
+            color: #ef4444;
+            font-size: 14px;
+        }
+
+        .employee-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.info {
+            border-left: 4px solid #667eea;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header" id="gameHeader">
+            <div class="header-left">
+                <h1>小老板养成记 - 奶茶店</h1>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-label">资金</div>
+                    <div class="stat-value money" id="headerMoney">¥50,000</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">第</div>
+                    <div class="stat-value day" id="headerDay">1</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">顾客</div>
+                    <div class="stat-value" id="headerCustomers">0</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="game.showStats()">📊 统计</button>
+                <button class="btn btn-warning" onclick="game.saveGame(1)">📁 存档1</button>
+                <button class="btn btn-warning" onclick="game.saveGame(2)">📁 存档2</button>
+                <button class="btn btn-warning" onclick="game.saveGame(3)">📁 存档3</button>
+                <button class="btn btn-primary" onclick="game.endDay()">🌙 结束今天</button>
+            </div>
+        </div>
+
+        <div id="welcomeScreen" class="panel welcome-panel">
+            <h2>欢迎来到《奶茶店养成记》</h2>
+            <p>作为一位奶茶店老板，你需要管理原料采购、产品定价、员工雇佣，<br>通过精明的经营策略让你的奶茶店蒸蒸日上！</p>
+            <div class="difficulty-select">
+                <div class="difficulty-btn" onclick="game.selectDifficulty('easy')">
+                    <h3>简单模式</h3>
+                    <p>启动资金 ¥50,000</p>
+                </div>
+                <div class="difficulty-btn selected" onclick="game.selectDifficulty('normal')">
+                    <h3>普通模式</h3>
+                    <p>启动资金 ¥30,000</p>
+                </div>
+                <div class="difficulty-btn" onclick="game.selectDifficulty('hard')">
+                    <h3>困难模式</h3>
+                    <p>启动资金 ¥10,000</p>
+                </div>
+            </div>
+            <button class="start-btn" onclick="game.startNewGame()">🎮 开始新游戏</button>
+
+            <div style="margin-top: 32px;">
+                <h3 style="margin-bottom: 16px; color: #333;">或加载存档</h3>
+                <div class="save-slots" id="saveSlots"></div>
+            </div>
+        </div>
+
+        <div id="gameContent" class="hidden">
+            <div class="main-content">
+                <div class="panel">
+                    <div class="panel-title">产品管理</div>
+                    <div class="product-list" id="productList"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">原料库存</div>
+                    <div class="inventory-section" id="inventoryList"></div>
+
+                    <div class="fixed-cost-panel" id="fixedCostPanel">
+                        <div class="fixed-cost-title">📊 固定费用（每周）</div>
+                        <div class="fixed-cost-item">
+                            <span class="label">房租</span>
+                            <span class="value" id="costRent">¥500/周</span>
+                        </div>
+                        <div class="fixed-cost-item">
+                            <span class="label">水电</span>
+                            <span class="value" id="costUtility">¥200/周</span>
+                        </div>
+                        <div class="fixed-cost-item">
+                            <span class="label">员工工资</span>
+                            <span class="value" id="costWage">¥0/周</span>
+                        </div>
+                        <div class="fixed-cost-total">
+                            <span class="label">每周固定支出</span>
+                            <span class="value" id="costTotal">¥700/周</span>
+                        </div>
+                    </div>
+
+                    <div class="panel-title" style="margin-top: 24px;">员工管理</div>
+                    <div class="employee-section" id="employeeList"></div>
+                    <button class="btn btn-primary" style="margin-top: 12px; width: 100%;" onclick="game.hireEmployee()">+ 雇佣员工</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="daily-report" id="dailyReport">
+        <div class="report-content">
+            <div class="report-header">
+                <h2>📊 今日营业报告</h2>
+                <div class="report-date" id="reportDate">第 1 天</div>
+            </div>
+            <div class="report-event hidden" id="reportEvent"></div>
+            <div class="report-total">
+                <div class="label">今日净利润</div>
+                <div class="value" id="reportProfit">¥0</div>
+            </div>
+            <div class="report-items">
+                <div class="report-item">
+                    <span class="label">销售收入</span>
+                    <span class="value positive" id="reportIncome">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">原料成本</span>
+                    <span class="value negative" id="reportCost">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">人力成本</span>
+                    <span class="value negative" id="reportWage">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">房租水电</span>
+                    <span class="value negative" id="reportRent">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">服务顾客</span>
+                    <span class="value" id="reportCustomers">0 位</span>
+                </div>
+            </div>
+            <div class="report-title">📦 产品销量明细</div>
+            <div class="report-detail" id="productSalesDetail"></div>
+            <div class="report-title">🥤 原料消耗明细</div>
+            <div class="report-detail" id="ingredientUsageDetail"></div>
+            <div class="report-actions">
+                <button class="btn btn-primary" onclick="game.closeReport()">继续营业</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <div class="daily-report" id="statsPanel">
+        <div class="report-content" style="max-width: 600px;">
+            <div class="report-header">
+                <h2>📊 经营统计报表</h2>
+                <div class="stats-toggle">
+                    <button class="toggle-btn active" id="toggleTotal" onclick="game.showStats('total')">累计</button>
+                    <button class="toggle-btn" id="toggleDaily" onclick="game.showStats('daily')">每日</button>
+                    <button class="toggle-btn" id="toggleAnalysis" onclick="game.showStats('analysis')">分析</button>
+                </div>
+                <div class="stats-nav" id="statsNav" style="display: none;">
+                    <button class="nav-btn" onclick="game.prevDay()">◀</button>
+                    <span id="statsDayNum">第 1 天</span>
+                    <button class="nav-btn" onclick="game.nextDay()">▶</button>
+                </div>
+            </div>
+            <div class="report-date" id="statsDate">累计经营数据</div>
+            <div class="report-items">
+                <div class="report-item">
+                    <span class="label">总营业收入</span>
+                    <span class="value positive" id="statsIncome">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">总净利润</span>
+                    <span class="value" id="statsProfit">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">总服务顾客</span>
+                    <span class="value" id="statsCustomers">0 位</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">平均日利润</span>
+                    <span class="value" id="statsAvgProfit">¥0</span>
+                </div>
+                <div class="report-item">
+                    <span class="label">最佳单日</span>
+                    <span class="value" id="statsBestDay">¥0</span>
+                </div>
+            </div>
+            <div class="report-title" style="margin: 20px 0 12px; font-weight: 600; color: #333;">产品销量排行</div>
+            <div class="product-rank" id="productRank"></div>
+            <div class="report-title" style="margin: 20px 0 12px; font-weight: 600; color: #333;">原料消耗统计</div>
+            <div class="ingredient-stats" id="ingredientStats"></div>
+            <div class="report-actions">
+                <button class="btn btn-primary" onclick="game.closeStats()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GameConfig = {
+            easy: { money: 50000, name: '简单模式' },
+            normal: { money: 30000, name: '普通模式' },
+            hard: { money: 10000, name: '困难模式' }
+        };
+
+        const Products = [
+            { id: 'milk_tea', name: '原味奶茶', basePrice: 12, taste: 3, ingredients: { milk: 1, tea: 1, sugar: 1 } },
+            { id: 'brown_sugar', name: '波霸奶茶', basePrice: 15, taste: 4, ingredients: { milk: 1, tea: 1, sugar: 1, tapioca: 1 } },
+            { id: 'fruit_tea', name: '水果茶', basePrice: 18, taste: 4, ingredients: { fruit: 2, tea: 1, sugar: 1 } },
+            { id: 'matcha', name: '抹茶拿铁', basePrice: 22, taste: 5, ingredients: { matcha: 1, milk: 1, sugar: 1 } }
+        ];
+
+        const Ingredients = [
+            { id: 'milk', name: '牛奶', unit: '盒', price: 2.5, shelfLife: 7 },
+            { id: 'tea', name: '茶叶', unit: '包', price: 1.5, shelfLife: 30 },
+            { id: 'sugar', name: '糖浆', unit: '瓶', price: 3, shelfLife: 60 },
+            { id: 'tapioca', name: '珍珠', unit: '袋', price: 4, shelfLife: 14 },
+            { id: 'fruit', name: '水果', unit: '个', price: 2, shelfLife: 5 },
+            { id: 'matcha', name: '抹茶粉', unit: '罐', price: 15, shelfLife: 90 }
+        ];
+
+        const FixedCosts = {
+            rent: 500,
+            utility: 200
+        };
+
+        const EmployeeNames = ['小李', '小王', '小张', '小陈', '小刘', '小赵', '小周', '小吴'];
+        const Events = [
+            { text: '附近写字楼举办活动，客流量增加30%!', effect: { customerMult: 1.3 } },
+            { text: '今天天气晴朗，来买奶茶的人真多!', effect: { customerMult: 1.2 } },
+            { text: '竞争对手降价促销，生意受到一些影响...', effect: { customerMult: 0.7 } },
+            { text: '原料供应商周年庆，部分原料8折!', effect: { priceMult: 0.8 } },
+            { text: '台风天气来袭，街上的行人也变少了...', effect: { customerMult: 0.5 } },
+            { text: '网红打卡推荐，店铺知名度上升!', effect: { customerMult: 1.4 } },
+            { text: '下雨天和热奶茶更配哦~', effect: { customerMult: 1.1 } },
+            { text: '原料价格上涨，进货成本增加了15%', effect: { priceMult: 1.15 } }
+        ];
+
+        class Game {
+            constructor() {
+                this.state = null;
+                this.selectedDifficulty = 'normal';
+                this.selectedDayIndex = -1;
+                try {
+                    this.init();
+                } catch (e) {
+                    console.error('Game init error:', e);
+                }
+            }
+
+            init() {
+                this.renderSaveSlots();
+                this.loadAutoSave();
+            }
+
+            selectDifficulty(difficulty) {
+                this.selectedDifficulty = difficulty;
+                document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('selected'));
+                if (event && event.target) {
+                    event.target.closest('.difficulty-btn').classList.add('selected');
+                }
+            }
+
+            startNewGame() {
+                this.state = {
+                    difficulty: this.selectedDifficulty,
+                    money: GameConfig[this.selectedDifficulty].money,
+                    day: 1,
+                    products: JSON.parse(JSON.stringify(Products)).map(p => ({ ...p, price: p.basePrice })),
+                    inventory: {},
+                    employees: [],
+                    dailyStats: {
+                        customers: 0,
+                        income: 0,
+                        cost: 0,
+                        wage: 0,
+                        rent: 0
+                    },
+                    productSales: {},
+                    totalCustomers: 0,
+                    totalIncome: 0,
+                    totalProfit: 0,
+                    dailyProfits: [],
+                    dailyStatsHistory: []
+                };
+
+                Products.forEach(p => {
+                    this.state.productSales[p.id] = 0;
+                });
+
+                Ingredients.forEach(ing => {
+                    this.state.inventory[ing.id] = { quantity: 10, expireDay: 7 };
+                });
+
+                this.state.employees.push({
+                    name: '店员小王',
+                    position: '店员',
+                    efficiency: 1.0,
+                    wage: 1500,
+                    hired: false
+                });
+
+                this.hideWelcome();
+                this.render();
+                this.showNotification('游戏开始！祝你生意兴隆~', 'success');
+            }
+
+            hideWelcome() {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                document.getElementById('gameContent').classList.remove('hidden');
+            }
+
+            showWelcome() {
+                document.getElementById('welcomeScreen').classList.remove('hidden');
+                document.getElementById('gameContent').classList.add('hidden');
+                this.renderSaveSlots();
+            }
+
+            render() {
+                document.getElementById('headerMoney').textContent = '¥' + this.state.money.toLocaleString();
+                document.getElementById('headerDay').textContent = this.state.day;
+                document.getElementById('headerCustomers').textContent = this.state.totalCustomers;
+
+                this.renderProducts();
+                this.renderInventory();
+                this.renderEmployees();
+            }
+
+            renderProducts() {
+                const container = document.getElementById('productList');
+                container.innerHTML = '';
+
+                this.state.products.forEach(product => {
+                    const totalCost = this.getProductCost(product);
+                    const profit = product.price - totalCost;
+                    const stock = this.getProductStock(product);
+
+                    const recipeHtml = Object.entries(product.ingredients).map(([ingId, amount]) => {
+                        const ing = Ingredients.find(i => i.id === ingId);
+                        return `<span class="recipe-item">${ing.name}×${amount}</span>`;
+                    }).join('');
+
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <div class="product-header">
+                            <span class="product-name">${product.name}</span>
+                            <span class="product-stock ${stock < 5 ? 'low' : ''}">可制作: ${stock}份</span>
+                        </div>
+                        <div class="product-recipe">
+                            <span class="recipe-label">配方:</span>
+                            ${recipeHtml}
+                        </div>
+                        <div class="product-inputs">
+                            <div class="input-group">
+                                <label>售价 (¥)</label>
+                                <input type="number" value="${product.price}" min="1" onchange="game.updatePrice('${product.id}', this.value)">
+                            </div>
+                            <div class="input-group">
+                                <label>建议售价</label>
+                                <input type="text" value="¥${product.basePrice}" disabled style="background: #e2e8f0;">
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <span>成本: <span class="value">¥${totalCost.toFixed(1)}</span></span>
+                            <span>毛利: <span class="profit">¥${profit.toFixed(1)}</span></span>
+                            <span>口味: <span class="value">${'⭐'.repeat(product.taste)}</span></span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            getProductStock(product) {
+                let minStock = Infinity;
+                for (const [ingId, amount] of Object.entries(product.ingredients)) {
+                    const qty = this.state.inventory[ingId]?.quantity || 0;
+                    const possible = Math.floor(qty / amount);
+                    minStock = Math.min(minStock, possible);
+                }
+                return minStock === Infinity ? 0 : minStock;
+            }
+
+            getProductCost(product) {
+                let cost = 0;
+                for (const [ingId, amount] of Object.entries(product.ingredients)) {
+                    const ing = Ingredients.find(i => i.id === ingId);
+                    cost += ing.price * amount;
+                }
+                return cost;
+            }
+
+            updatePrice(productId, newPrice) {
+                const product = this.state.products.find(p => p.id === productId);
+                if (product) {
+                    product.price = parseFloat(newPrice) || product.basePrice;
+                    this.renderProducts();
+                }
+            }
+
+            renderInventory() {
+                const container = document.getElementById('inventoryList');
+                container.innerHTML = '';
+
+                const header = document.createElement('div');
+                header.className = 'inventory-header';
+                header.innerHTML = `
+                    <span class="inventory-header-title">原料</span>
+                    <span class="inventory-header-price">单价</span>
+                `;
+                container.appendChild(header);
+
+                Ingredients.forEach(ing => {
+                    const inv = this.state.inventory[ing.id] || { quantity: 0 };
+                    const item = document.createElement('div');
+                    item.className = 'inventory-item';
+                    item.innerHTML = `
+                        <span class="inventory-name">${ing.name}</span>
+                        <div class="inventory-actions">
+                            <span style="color: #64748b; font-size: 12px; margin-right: 8px;">¥${ing.price}/${ing.unit}</span>
+                            <span>${inv.quantity} ${ing.unit}</span>
+                            <input type="number" id="buy_${ing.id}" value="50" min="0" style="width: 50px;" onchange="game.previewPurchase('${ing.id}')" oninput="game.previewPurchase('${ing.id}')">
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+
+                const cartSection = document.createElement('div');
+                cartSection.className = 'cart-section';
+                cartSection.innerHTML = `
+                    <div class="cart-preview" id="cartPreview">
+                        <div class="cart-title">🛒 采购预览</div>
+                        <div class="cart-items" id="cartItems">请在上方输入采购数量</div>
+                        <div class="cart-total">
+                            <span>预计总花费:</span>
+                            <span id="cartTotalAmount">¥0</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="game.quickFill50()">快速填入50</button>
+                        <button class="btn btn-success" style="flex: 1;" onclick="game.confirmPurchase()">✅ 确认采购</button>
+                    </div>
+                `;
+                container.appendChild(cartSection);
+
+                this.renderFixedCosts();
+            }
+
+            previewPurchase(ingId) {
+                const input = document.getElementById(`buy_${ingId}`);
+                const amount = parseInt(input.value) || 0;
+                
+                this.state.cart = this.state.cart || {};
+                this.state.cart[ingId] = amount;
+
+                this.updateCartPreview();
+            }
+
+            quickFill50() {
+                Ingredients.forEach(ing => {
+                    const input = document.getElementById(`buy_${ing.id}`);
+                    if (input) {
+                        input.value = 50;
+                        this.previewPurchase(ing.id);
+                    }
+                });
+            }
+
+            updateCartPreview() {
+                const cartItems = document.getElementById('cartItems');
+                const cartTotalAmount = document.getElementById('cartTotalAmount');
+                
+                if (!this.state.cart) {
+                    cartItems.innerHTML = '请在上方输入采购数量';
+                    cartTotalAmount.textContent = '¥0';
+                    return;
+                }
+
+                let totalCost = 0;
+                let hasInput = false;
+                const itemsHtml = [];
+
+                Object.entries(this.state.cart).forEach(([ingId, amount]) => {
+                    if (amount > 0) {
+                        hasInput = true;
+                        const ing = Ingredients.find(i => i.id === ingId);
+                        const cost = ing.price * amount;
+                        totalCost += cost;
+                        const currentQty = this.state.inventory[ingId]?.quantity || 0;
+                        const newQty = currentQty + amount;
+                        itemsHtml.push(`<div class="cart-item"><span>${ing.name}</span><span>+${amount} ${ing.unit} (共${newQty}${ing.unit})</span></div>`);
+                    }
+                });
+
+                if (!hasInput) {
+                    cartItems.innerHTML = '请在上方输入采购数量';
+                } else {
+                    const possibleProducts = this.calculatePossibleProducts();
+                    cartItems.innerHTML = itemsHtml.join('') + `<div class="cart-products">可制作: ${possibleProducts.map(p => `${p.name}×${p.count}`).join(', ')}</div>`;
+                }
+
+                cartTotalAmount.textContent = `¥${totalCost}`;
+            }
+
+            calculatePossibleProducts() {
+                const tempInventory = { ...this.state.inventory };
+                
+                Object.keys(tempInventory).forEach(key => {
+                    tempInventory[key] = { quantity: tempInventory[key].quantity || 0 };
+                });
+
+                Object.entries(this.state.cart || {}).forEach(([ingId, amount]) => {
+                    if (amount > 0 && tempInventory[ingId]) {
+                        tempInventory[ingId].quantity += amount;
+                    }
+                });
+
+                const results = [];
+                this.state.products.forEach(product => {
+                    let minStock = Infinity;
+                    for (const [ingId, amount] of Object.entries(product.ingredients)) {
+                        const qty = tempInventory[ingId]?.quantity || 0;
+                        const possible = Math.floor(qty / amount);
+                        minStock = Math.min(minStock, possible);
+                    }
+                    if (minStock > 0) {
+                        results.push({ name: product.name, count: minStock });
+                    }
+                });
+                return results;
+            }
+
+            confirmPurchase() {
+                if (!this.state.cart) return;
+                
+                let totalCost = 0;
+                Object.entries(this.state.cart).forEach(([ingId, amount]) => {
+                    if (amount > 0) {
+                        const ing = Ingredients.find(i => i.id === ingId);
+                        totalCost += ing.price * amount;
+                    }
+                });
+
+                if (totalCost <= 0) {
+                    this.showNotification('请先输入采购数量！', 'error');
+                    return;
+                }
+
+                if (this.state.money < totalCost) {
+                    this.showNotification('资金不足！', 'error');
+                    return;
+                }
+
+                Object.entries(this.state.cart).forEach(([ingId, amount]) => {
+                    if (amount > 0) {
+                        this.state.inventory[ingId].quantity += amount;
+                    }
+                });
+
+                this.state.money -= totalCost;
+                this.state.cart = {};
+
+                this.render();
+                this.showNotification(`采购成功！共花费 ¥${totalCost}`, 'success');
+            }
+
+            renderFixedCosts() {
+                const weeklyWage = this.state.employees.reduce((sum, e) => sum + e.wage, 0);
+                const weeklyTotal = FixedCosts.rent + FixedCosts.utility + weeklyWage;
+
+                document.getElementById('costRent').textContent = `¥${FixedCosts.rent}/周`;
+                document.getElementById('costUtility').textContent = `¥${FixedCosts.utility}/周`;
+                document.getElementById('costWage').textContent = `¥${weeklyWage}/周`;
+                document.getElementById('costTotal').textContent = `¥${weeklyTotal}/周`;
+            }
+
+            buyIngredient(ingId) {
+                const input = document.getElementById(`buy_${ingId}`);
+                const amount = parseInt(input.value) || 0;
+                if (amount <= 0) return;
+
+                const ing = Ingredients.find(i => i.id === ingId);
+                const totalCost = ing.price * amount;
+
+                if (this.state.money < totalCost) {
+                    this.showNotification('资金不足！', 'error');
+                    return;
+                }
+
+                this.state.money -= totalCost;
+                this.state.inventory[ingId].quantity += amount;
+
+                this.render();
+                this.showNotification(`购买了 ${amount} ${ing.unit} ${ing.name}，花费 ¥${totalCost}`, 'success');
+            }
+
+            renderEmployees() {
+                const container = document.getElementById('employeeList');
+                container.innerHTML = '';
+
+                this.state.employees.forEach((emp, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'employee-card';
+                    card.innerHTML = `
+                        <div class="employee-header">
+                            <span class="employee-name">${emp.name}</span>
+                            <span class="employee-wage">¥${emp.wage}/周</span>
+                        </div>
+                        <div class="employee-stats">
+                            <span>岗位: ${emp.position}</span>
+                            <span>效率: ${(emp.efficiency * 100).toFixed(0)}%</span>
+                        </div>
+                        ${index > 0 ? `<button class="mini-btn danger" style="margin-top: 8px;" onclick="game.fireEmployee(${index})">解雇</button>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            hireEmployee() {
+                if (this.state.employees.length >= 4) {
+                    this.showNotification('员工已满！', 'error');
+                    return;
+                }
+
+                const availableNames = EmployeeNames.filter(name => 
+                    !this.state.employees.some(e => e.name === name)
+                );
+                
+                if (availableNames.length === 0) {
+                    this.showNotification('没有可雇佣的员工了！', 'error');
+                    return;
+                }
+
+                const name = availableNames[Math.floor(Math.random() * availableNames.length)];
+                const wage = 1200 + Math.floor(Math.random() * 800);
+                const efficiency = 0.8 + Math.random() * 0.4;
+
+                this.state.employees.push({
+                    name: name,
+                    position: '店员',
+                    efficiency: efficiency,
+                    wage: wage,
+                    hired: true
+                });
+
+                this.render();
+                this.showNotification(`雇佣了 ${name}，周工资 ¥${wage}`, 'success');
+            }
+
+            fireEmployee(index) {
+                const emp = this.state.employees[index];
+                this.state.employees.splice(index, 1);
+                this.render();
+                this.showNotification(`解雇了 ${emp.name}`, 'info');
+            }
+
+            endDay() {
+                try {
+                    if (!this.state.productSales) {
+                        this.state.productSales = {};
+                        Products.forEach(p => {
+                            this.state.productSales[p.id] = 0;
+                        });
+                    }
+
+                    if (!this.state.dailyProfits) {
+                        this.state.dailyProfits = [];
+                    }
+                    if (!this.state.totalProfit) {
+                        this.state.totalProfit = 0;
+                    }
+                    if (!this.state.dailyStatsHistory) {
+                        this.state.dailyStatsHistory = [];
+                    }
+
+                    const baseCustomers = 30 + this.state.day * 2;
+                    const employeeBonus = this.state.employees.reduce((sum, e) => sum + e.efficiency * 5, 0);
+                    
+                    let customerMult = 1;
+                    let priceMult = 1;
+
+                    if (Math.random() < 0.3) {
+                        const event = Events[Math.floor(Math.random() * Events.length)];
+                        if (event.effect.customerMult) customerMult = event.effect.customerMult;
+                        if (event.effect.priceMult) priceMult = event.effect.priceMult;
+                        
+                        document.getElementById('reportEvent').textContent = event.text;
+                        document.getElementById('reportEvent').classList.remove('hidden');
+                    } else {
+                        document.getElementById('reportEvent').classList.add('hidden');
+                    }
+
+                    const customers = Math.floor((baseCustomers + employeeBonus) * customerMult * (0.8 + Math.random() * 0.4));
+                    let income = 0;
+                    let cost = 0;
+                    const dailyProductSales = {};
+                    const dailyIngredientUsage = {};
+
+                    this.state.products.forEach(product => {
+                        const stock = this.getProductStock(product);
+                        const sold = Math.min(stock, Math.floor(customers / this.state.products.length * (0.5 + product.taste / 10)));
+                        
+                        if (sold > 0) {
+                            const price = product.price * priceMult;
+                            income += price * sold;
+                            
+                            const productCost = this.getProductCost(product);
+                            cost += productCost * sold;
+                            
+                            this.state.productSales[product.id] = (this.state.productSales[product.id] || 0) + sold;
+                            dailyProductSales[product.id] = sold;
+
+                            for (const [ingId, amount] of Object.entries(product.ingredients)) {
+                                const usage = amount * sold;
+                                this.state.inventory[ingId].quantity -= usage;
+                                dailyIngredientUsage[ingId] = (dailyIngredientUsage[ingId] || 0) + usage;
+                            }
+                        }
+                    });
+
+                    const weeklyWage = this.state.employees.reduce((sum, e) => sum + e.wage, 0);
+                    const dailyWage = Math.ceil(weeklyWage / 7);
+                    const dailyRent = Math.ceil(FixedCosts.rent / 7);
+                    const dailyUtility = Math.ceil(FixedCosts.utility / 7);
+                    const dailyFixedCost = dailyWage + dailyRent + dailyUtility;
+
+                    const profit = income - cost - dailyFixedCost;
+                    
+                    this.state.money += profit;
+
+                    this.state.totalCustomers += customers;
+                    this.state.totalIncome += income;
+                    this.state.totalProfit += profit;
+                    this.state.dailyProfits.push(profit);
+                    this.state.dailyStatsHistory.push({
+                        day: this.state.day,
+                        customers: customers,
+                        income: income,
+                        cost: cost,
+                        profit: profit,
+                        productSales: { ...dailyProductSales },
+                        ingredientUsage: { ...dailyIngredientUsage }
+                    });
+
+                    document.getElementById('reportDate').textContent = `第 ${this.state.day} 天`;
+                    document.getElementById('reportProfit').textContent = (profit >= 0 ? '+' : '') + '¥' + profit.toLocaleString();
+                    document.getElementById('reportProfit').className = 'value ' + (profit >= 0 ? 'positive' : 'negative');
+                    document.getElementById('reportIncome').textContent = '¥' + income.toLocaleString();
+                    document.getElementById('reportCost').textContent = '-¥' + cost.toLocaleString();
+                    document.getElementById('reportWage').textContent = '-¥' + dailyWage.toLocaleString();
+                    document.getElementById('reportRent').textContent = `-¥${dailyRent} (房租) -¥${dailyUtility} (水电)`;
+                    document.getElementById('reportCustomers').textContent = customers + ' 位';
+
+                    const productSalesDetail = document.getElementById('productSalesDetail');
+                    const productHtml = Object.entries(dailyProductSales).map(([id, sold]) => {
+                        const product = this.state.products.find(p => p.id === id);
+                        return `<div class="detail-row"><span class="label">${product.name}</span><span class="value">${sold} 杯</span></div>`;
+                    }).join('');
+                    productSalesDetail.innerHTML = productHtml || '<div class="detail-row"><span class="label">无销售</span></div>';
+
+                    const ingredientUsageDetail = document.getElementById('ingredientUsageDetail');
+                    const ingHtml = Object.entries(dailyIngredientUsage).map(([id, amount]) => {
+                        const ing = Ingredients.find(i => i.id === id);
+                        return `<div class="detail-row"><span class="label">${ing.name}</span><span class="value">${amount} ${ing.unit}</span></div>`;
+                    }).join('');
+                    ingredientUsageDetail.innerHTML = ingHtml || '<div class="detail-row"><span class="label">无消耗</span></div>';
+
+                    document.getElementById('dailyReport').classList.add('active');
+
+                    if (this.state.money < 0) {
+                        this.showNotification('资金为负！请尽快调整经营策略！', 'error');
+                    }
+                } catch (e) {
+                    console.error('endDay error:', e);
+                    alert('发生错误: ' + e.message);
+                }
+            }
+
+            closeReport() {
+                document.getElementById('dailyReport').classList.remove('active');
+                this.state.day++;
+                this.render();
+                this.autoSave();
+            }
+
+            showStats(mode = 'total') {
+                try {
+                    if (!this.state) return;
+
+                    if (!this.state.productSales) {
+                        this.state.productSales = {};
+                        Products.forEach(p => {
+                            this.state.productSales[p.id] = 0;
+                        });
+                    }
+
+                    if (!this.state.dailyStatsHistory) {
+                        this.state.dailyStatsHistory = [];
+                    }
+
+                    document.getElementById('toggleTotal').className = 'toggle-btn ' + (mode === 'total' ? 'active' : '');
+                    document.getElementById('toggleDaily').className = 'toggle-btn ' + (mode === 'daily' ? 'active' : '');
+
+                    if (mode === 'total') {
+                        document.getElementById('statsNav').style.display = 'none';
+                        this.renderTotalStats();
+                    } else if (mode === 'daily') {
+                        document.getElementById('statsNav').style.display = 'flex';
+                        this.selectedDayIndex = (this.state.dailyStatsHistory?.length || 1) - 1;
+                        if (this.selectedDayIndex < 0) this.selectedDayIndex = 0;
+                        this.renderDailyStats();
+                    } else if (mode === 'analysis') {
+                        document.getElementById('statsNav').style.display = 'none';
+                        this.renderAnalysis();
+                    }
+
+                    document.getElementById('statsPanel').classList.add('active');
+                } catch (e) {
+                    console.error('showStats error:', e);
+                }
+            }
+
+            renderTotalStats() {
+                document.getElementById('statsDate').textContent = `累计 ${this.state.day - 1} 天经营数据`;
+                document.getElementById('statsIncome').textContent = '¥' + this.state.totalIncome.toLocaleString();
+                
+                const totalProfit = this.state.totalProfit || 0;
+                const profitEl = document.getElementById('statsProfit');
+                profitEl.textContent = (totalProfit >= 0 ? '+' : '') + '¥' + totalProfit.toLocaleString();
+                profitEl.className = 'value ' + (totalProfit >= 0 ? 'positive' : 'negative');
+                
+                document.getElementById('statsCustomers').textContent = this.state.totalCustomers + ' 位';
+                
+                const dailyProfits = this.state.dailyProfits || [];
+                const days = dailyProfits.length || 1;
+                const avgProfit = dailyProfits.length > 0 ? Math.round(totalProfit / days) : 0;
+                document.getElementById('statsAvgProfit').textContent = (avgProfit >= 0 ? '+' : '') + '¥' + avgProfit.toLocaleString();
+                
+                const bestDay = dailyProfits.length > 0 ? Math.max(...dailyProfits) : 0;
+                document.getElementById('statsBestDay').textContent = '+¥' + bestDay.toLocaleString();
+
+                const productRank = document.getElementById('productRank');
+                const sortedProducts = this.state.products
+                    .map(p => ({ ...p, sales: this.state.productSales[p.id] || 0 }))
+                    .sort((a, b) => b.sales - a.sales);
+
+                productRank.innerHTML = sortedProducts.map((p, i) => `
+                    <div class="rank-item">
+                        <span class="rank-num">${i + 1}</span>
+                        <span class="rank-name">${p.name}</span>
+                        <span class="rank-sales">${p.sales} 杯</span>
+                        <span class="rank-revenue">¥${(p.sales * p.price).toLocaleString()}</span>
+                    </div>
+                `).join('');
+
+                const ingredientStats = document.getElementById('ingredientStats');
+                const ingredientUsage = {};
+                
+                this.state.products.forEach(product => {
+                    const sales = this.state.productSales[product.id] || 0;
+                    Object.entries(product.ingredients).forEach(([ingId, amount]) => {
+                        ingredientUsage[ingId] = (ingredientUsage[ingId] || 0) + amount * sales;
+                    });
+                });
+
+                ingredientStats.innerHTML = Object.entries(ingredientUsage).map(([ingId, total]) => {
+                    const ing = Ingredients.find(i => i.id === ingId);
+                    return `<div class="ing-stat-item">
+                        <span>${ing.name}</span>
+                        <span>共消耗 ${total} ${ing.unit}</span>
+                    </div>`;
+                }).join('') || '<div style="color: #64748b; font-size: 13px;">暂无消耗数据</div>';
+            }
+
+            renderDailyStats() {
+                const history = this.state.dailyStatsHistory || [];
+                
+                if (history.length === 0) {
+                    document.getElementById('statsDate').textContent = '暂无每日数据';
+                    document.getElementById('statsIncome').textContent = '¥0';
+                    document.getElementById('statsProfit').textContent = '¥0';
+                    document.getElementById('statsProfit').className = 'value';
+                    document.getElementById('statsCustomers').textContent = '0 位';
+                    document.getElementById('statsAvgProfit').textContent = '¥0';
+                    document.getElementById('statsBestDay').textContent = '¥0';
+                    document.getElementById('productRank').innerHTML = '<div style="color: #64748b; text-align: center;">暂无数据</div>';
+                    document.getElementById('ingredientStats').innerHTML = '<div style="color: #64748b; font-size: 13px;">暂无消耗数据</div>';
+                    return;
+                }
+
+                const latest = history[this.selectedDayIndex];
+                document.getElementById('statsDate').textContent = `第 ${latest.day} 天`;
+                document.getElementById('statsIncome').textContent = '¥' + latest.income.toLocaleString();
+                
+                const profitEl = document.getElementById('statsProfit');
+                profitEl.textContent = (latest.profit >= 0 ? '+' : '') + '¥' + latest.profit.toLocaleString();
+                profitEl.className = 'value ' + (latest.profit >= 0 ? 'positive' : 'negative');
+                
+                document.getElementById('statsCustomers').textContent = latest.customers + ' 位';
+                document.getElementById('statsAvgProfit').textContent = '-';
+                document.getElementById('statsBestDay').textContent = '-';
+
+                const productRank = document.getElementById('productRank');
+                const productHtml = Object.entries(latest.productSales || {}).map(([id, sold]) => {
+                    const product = this.state.products.find(p => p.id === id);
+                    return `<div class="rank-item">
+                        <span class="rank-num">-</span>
+                        <span class="rank-name">${product.name}</span>
+                        <span class="rank-sales">${sold} 杯</span>
+                        <span class="rank-revenue">¥${(sold * product.price).toLocaleString()}</span>
+                    </div>`;
+                }).join('');
+                productRank.innerHTML = productHtml || '<div style="color: #64748b; text-align: center;">无销售</div>';
+
+                const ingredientStats = document.getElementById('ingredientStats');
+                const ingHtml = Object.entries(latest.ingredientUsage || {}).map(([id, amount]) => {
+                    const ing = Ingredients.find(i => i.id === id);
+                    return `<div class="ing-stat-item">
+                        <span>${ing.name}</span>
+                        <span>消耗 ${amount} ${ing.unit}</span>
+                    </div>`;
+                }).join('');
+                ingredientStats.innerHTML = ingHtml || '<div style="color: #64748b; font-size: 13px;">无消耗</div>';
+                
+                document.getElementById('statsDayNum').textContent = `第 ${history[this.selectedDayIndex].day} 天`;
+                
+                const prevBtn = document.querySelector('#statsNav .nav-btn:first-child');
+                const nextBtn = document.querySelector('#statsNav .nav-btn:last-child');
+                prevBtn.disabled = this.selectedDayIndex === 0;
+                prevBtn.style.opacity = this.selectedDayIndex === 0 ? '0.3' : '1';
+                nextBtn.disabled = this.selectedDayIndex === history.length - 1;
+                nextBtn.style.opacity = this.selectedDayIndex === history.length - 1 ? '0.3' : '1';
+            }
+
+            prevDay() {
+                if (this.selectedDayIndex > 0) {
+                    this.selectedDayIndex--;
+                    this.renderDailyStats();
+                }
+            }
+
+            nextDay() {
+                const history = this.state.dailyStatsHistory || [];
+                if (this.selectedDayIndex < history.length - 1) {
+                    this.selectedDayIndex++;
+                    this.renderDailyStats();
+                }
+            }
+
+            renderAnalysis() {
+                const history = this.state.dailyStatsHistory || [];
+                const days = history.length || 1;
+                
+                if (history.length === 0) {
+                    document.getElementById('statsDate').textContent = '经营分析';
+                    document.getElementById('productRank').innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">暂无经营数据<br>请先开始营业几天后再查看分析</div>';
+                    document.getElementById('ingredientStats').innerHTML = '';
+                    return;
+                }
+                
+                const avgDailyIncome = this.state.totalIncome / days;
+                const avgDailyCost = history.reduce((sum, h) => sum + (h.cost || 0), 0) / days;
+                const avgDailyProfit = this.state.totalProfit / days;
+                
+                const avgCustomers = this.state.totalCustomers / days;
+                const avgTicket = avgCustomers > 0 ? avgDailyIncome / avgCustomers : 0;
+                
+                const weeklyWage = this.state.employees.reduce((sum, e) => sum + e.wage, 0);
+                const dailyWage = Math.ceil(weeklyWage / 7);
+                const dailyRent = Math.ceil(FixedCosts.rent / 7);
+                const dailyUtility = Math.ceil(FixedCosts.utility / 7);
+                const dailyFixedCost = dailyWage + dailyRent + dailyUtility;
+                
+                const baseCustomers = 30 + this.state.day * 2;
+                const employeeBonus = this.state.employees.reduce((sum, e) => sum + e.efficiency * 5, 0);
+                const currentCustomers = baseCustomers + employeeBonus;
+                
+                const productRank = document.getElementById('productRank');
+                const ingredientStats = document.getElementById('ingredientStats');
+                
+                let analysisHtml = `
+                    <div class="analysis-section">
+                        <div class="analysis-title">📈 经营概况</div>
+                        <div class="analysis-row">
+                            <span>平均日收入</span>
+                            <span class="value">¥${Math.round(avgDailyIncome).toLocaleString()}</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>平均日成本</span>
+                            <span class="value negative">-¥${Math.round(avgDailyCost).toLocaleString()}</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>平均日利润</span>
+                            <span class="value ${avgDailyProfit >= 0 ? 'positive' : 'negative'}">${avgDailyProfit >= 0 ? '+' : ''}¥${Math.round(avgDailyProfit).toLocaleString()}</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>客单价</span>
+                            <span class="value">¥${avgTicket.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <div class="analysis-title">👥 雇员影响分析</div>
+                        <div class="analysis-row">
+                            <span>当前雇员</span>
+                            <span class="value">${this.state.employees.length} 人</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>雇员带来额外顾客</span>
+                            <span class="value positive">+${employeeBonus} 位/天</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>日工资成本</span>
+                            <span class="value negative">-¥${dailyWage}</span>
+                        </div>
+                        <div class="analysis-insight">
+                            💡 每位雇员每天约带来 ${employeeBonus / (this.state.employees.length || 1)} 位顾客，
+                            增加收入约 ¥${Math.round(employeeBonus / this.state.products.length * this.state.products[0]?.price || 0)}
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <div class="analysis-title">💰 定价影响分析</div>
+                        ${this.state.products.map(p => {
+                            const cost = this.getProductCost(p);
+                            const currentProfit = p.price - cost;
+                            const priceChange10 = p.price * 1.1;
+                            const profit10 = priceChange10 - cost;
+                            const priceChange20 = p.price * 1.2;
+                            const profit20 = priceChange20 - cost;
+                            const avgSales = history.reduce((sum, h) => sum + (h.productSales?.[p.id] || 0), 0) / days;
+                            const elasticity = 1.5;
+                            const salesDrop10 = Math.round(avgSales * 0.1 * elasticity);
+                            const salesDrop20 = Math.round(avgSales * 0.2 * elasticity);
+                            const revenueChange10 = (priceChange10 * (avgSales - salesDrop10)) - (p.price * avgSales);
+                            const revenueChange20 = (priceChange20 * (avgSales - salesDrop20)) - (p.price * avgSales);
+                            return `
+                            <div class="product-analysis">
+                                <div class="product-name">${p.name} <span style="color:#64748b;font-size:11px;">(日均${Math.round(avgSales)}杯)</span></div>
+                                <div class="analysis-row">
+                                    <span>当前售价</span>
+                                    <span class="value">¥${p.price}</span>
+                                </div>
+                                <div class="analysis-row">
+                                    <span>当前利润</span>
+                                    <span class="value ${currentProfit >= 0 ? 'positive' : 'negative'}">¥${currentProfit.toFixed(2)}/杯</span>
+                                </div>
+                                <div class="analysis-row">
+                                    <span>涨价10%</span>
+                                    <span class="value">¥${priceChange10.toFixed(1)} 预估销量-${salesDrop10}杯</span>
+                                </div>
+                                <div class="analysis-row">
+                                    <span>涨价20%</span>
+                                    <span class="value">¥${priceChange20.toFixed(1)} 预估销量-${salesDrop20}杯</span>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <div class="analysis-title">🥤 原料涨价影响</div>
+                        ${Ingredients.map(ing => {
+                            const currentPrice = ing.price;
+                            const priceUp25 = currentPrice * 1.25;
+                            const priceUp50 = currentPrice * 1.5;
+                            const affectedProducts = this.state.products.filter(p => p.ingredients[ing.id]);
+                            const costUp25 = affectedProducts.reduce((sum, p) => sum + (p.ingredients[ing.id] * (priceUp25 - currentPrice)), 0);
+                            const costUp50 = affectedProducts.reduce((sum, p) => sum + (p.ingredients[ing.id] * (priceUp50 - currentPrice)), 0);
+                            const avgDailySales = history.reduce((sum, h) => {
+                                return sum + affectedProducts.reduce((s, p) => s + (h.productSales?.[p.id] || 0), 0);
+                            }, 0) / days;
+                            const profitLoss25 = Math.round(costUp25 * avgDailySales * 0.3);
+                            const profitLoss50 = Math.round(costUp50 * avgDailySales * 0.3);
+                            return `
+                            <div class="product-analysis">
+                                <div class="product-name">${ing.name}</div>
+                                <div class="analysis-row">
+                                    <span>当前采购价</span>
+                                    <span class="value">¥${currentPrice}/${ing.unit}</span>
+                                </div>
+                                <div class="analysis-row">
+                                    <span>涨价25%</span>
+                                    <span class="value negative">¥${priceUp25}/${ing.unit} 日损失~¥${profitLoss25}</span>
+                                </div>
+                                <div class="analysis-row">
+                                    <span>涨价50%</span>
+                                    <span class="value negative">¥${priceUp50}/${ing.unit} 日损失~¥${profitLoss50}</span>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <div class="analysis-title">📊 盈亏平衡分析</div>
+                        <div class="analysis-row">
+                            <span>日固定成本</span>
+                            <span class="value negative">¥${dailyFixedCost}</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>产品平均利润率</span>
+                            <span class="value">${((this.state.products.reduce((sum, p) => sum + (p.price - this.getProductCost(p)) / p.price * 100, 0) / this.state.products.length) || 0).toFixed(1)}%</span>
+                        </div>
+                        <div class="analysis-row">
+                            <span>盈亏平衡点</span>
+                            <span class="value">约 ¥${Math.ceil(dailyFixedCost / (this.state.products[0] ? (this.state.products[0].price - this.getProductCost(this.state.products[0])) / this.state.products[0].price : 0.3))} 收入</span>
+                        </div>
+                        <div class="analysis-insight">
+                            💡 当前每天需要卖出约 ${Math.ceil(dailyFixedCost / (this.state.products.reduce((sum, p) => sum + (p.price - this.getProductCost(p)), 0) / this.state.products.length))} 杯保本
+                        </div>
+                    </div>
+                `;
+                
+                productRank.innerHTML = analysisHtml;
+                ingredientStats.innerHTML = '';
+            }
+
+            closeStats() {
+                document.getElementById('statsPanel').classList.remove('active');
+            }
+
+            saveGame(slot) {
+                const saveData = {
+                    state: this.state,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(`game_save_${slot}`, JSON.stringify(saveData));
+                this.showNotification(`已保存到存档 ${slot}`, 'success');
+            }
+
+            loadGame(slot) {
+                const saveData = localStorage.getItem(`game_save_${slot}`);
+                if (saveData) {
+                    this.state = JSON.parse(saveData).state;
+                    this.hideWelcome();
+                    this.render();
+                    this.showNotification('存档加载成功！', 'success');
+                }
+            }
+
+            autoSave() {
+                if (this.state) {
+                    const saveData = {
+                        state: this.state,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem('game_auto_save', JSON.stringify(saveData));
+                }
+            }
+
+            loadAutoSave() {
+                const saveData = localStorage.getItem('game_auto_save');
+                if (saveData) {
+                    const data = JSON.parse(saveData);
+                    if (confirm('发现自动存档，是否加载？')) {
+                        this.state = data.state;
+                        this.hideWelcome();
+                        this.render();
+                        this.showNotification('自动存档加载成功！', 'success');
+                    }
+                }
+            }
+
+            renderSaveSlots() {
+                const container = document.getElementById('saveSlots');
+                container.innerHTML = '';
+
+                for (let i = 1; i <= 3; i++) {
+                    const saveData = localStorage.getItem(`game_save_${i}`);
+                    const slot = document.createElement('div');
+                    
+                    if (saveData) {
+                        const data = JSON.parse(saveData);
+                        const date = new Date(data.timestamp);
+                        slot.className = 'save-slot';
+                        slot.innerHTML = `
+                            <div class="slot-title">存档 ${i}</div>
+                            <div class="slot-info">
+                                第 ${data.state.day} 天<br>
+                                ¥${data.state.money.toLocaleString()}<br>
+                                ${date.toLocaleDateString()} ${date.toLocaleTimeString()}
+                            </div>
+                        `;
+                        slot.onclick = () => this.loadGame(i);
+                    } else {
+                        slot.className = 'save-slot empty';
+                        slot.innerHTML = `
+                            <div class="slot-title">存档 ${i}</div>
+                            <div class="slot-info">空存档</div>
+                        `;
+                    }
+                    
+                    container.appendChild(slot);
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                const text = document.getElementById('notificationText');
+                
+                notification.className = `notification ${type}`;
+                text.textContent = message;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        const game = new Game();
+    </script>
+</body>
+</html>
